@@ -1,19 +1,21 @@
 ---
 name: video-studio
-description: Edit raw video footage into a finished, professional-quality video — interviewing the user first about hook, zooms, motion graphics, subtitles, music, sound levels and cover, then cutting, captioning, scoring and quality-checking it. Use this whenever someone has a video file (.mov .mp4 .m4v .mkv) or a folder of takes and wants it edited, cut, trimmed, captioned, subtitled, sped up, turned into a reel / short / TikTok / YouTube video, given music or motion graphics, or simply "made professional" — even if they only say "here's my video, fix it", drag a clip in, or ask for a thumbnail or cover for it. Also use it to continue an edit that already has an edit/project.md.
+description: Edit raw video footage into a finished, professional-quality video — reading the material first, then deciding format, style, subtitles, music, sound levels and cover with the user, then cutting and quality-checking it. Use this whenever someone has a video file (.mov .mp4 .m4v .mkv) or a folder of takes and wants it edited, cut, trimmed, captioned, subtitled, turned into a reel / short / TikTok / YouTube video, given music or motion graphics, or simply "made professional" — even if they only say "here's my video, fix it", drag a clip in, or ask for a thumbnail or cover for it. Also use it to continue an edit that already has an edit/project.md.
 ---
 
 # Video Studio
 
-Turn raw footage into a finished video, for someone who may know nothing about editing.
+Turn raw footage into a finished video, working with someone who may know nothing about editing.
 
-The person you are working with is usually **not an editor**. They know what they want the video to feel like, not what a LUFS or a J-cut is. Your job is to ask about outcomes in their own words, make the technical decisions yourself, and show your work in numbers only when it proves the result is good.
+They know how they want to come across; they do not know what a LUFS is. So ask about outcomes in their words, make the technical calls yourself, and prove the result with numbers at the end.
 
-## Two rules that shape everything
+## Three rules that shape everything
 
-**Speak their language.** Answer and ask questions in whatever language the user writes to you in — Uzbek, Russian, English, anything. Subtitles follow the language spoken *in the video*, which is often different. Never make someone read English questions to edit their own Uzbek video.
+**Speak their language.** Ask and answer in whatever language they write in. Subtitles follow the language spoken *in the video*, which is often a different one.
 
-**No jargon without a plain-language anchor.** "LUFS" alone is useless; "−14 LUFS, the loudness Instagram expects" is fine. If you would need a diagram to explain a term, you probably shouldn't be asking about it at all — decide it yourself and report it afterwards.
+**Teach as you go.** One sentence per step saying what you are doing and why — "avval materialni o'lchayman, chunki tebranish qanchaligi kadr uzunligini hal qiladi". By the third video they will understand their own footage. Never a lecture: one sentence, then work.
+
+**Look before you ask.** A question asked blind gets "I don't know". A question asked after reading the transcript — quoting their own line, with a timestamp — gets a real answer in one click.
 
 ## Setup
 
@@ -21,79 +23,86 @@ The person you are working with is usually **not an editor**. They know what the
 bash ${CLAUDE_SKILL_DIR}/scripts/doctor.sh
 ```
 
-Any `FAIL` → run `bash ${CLAUDE_SKILL_DIR}/scripts/setup.sh`, follow what it prints, then check again. Never start editing on a broken toolchain; you will waste the user's time and their transcription credits.
-
-Run every bundled script through the wrapper, which loads the Python environment and the API key:
+`FAIL` → run `scripts/setup.sh`, follow it, check again. Every bundled script runs through the wrapper, which loads the Python environment and any API keys:
 
 ```bash
-bash ${CLAUDE_SKILL_DIR}/scripts/vs.sh <script> [args]     # e.g. vendor/render.py, captions.py
+bash ${CLAUDE_SKILL_DIR}/scripts/vs.sh <script> [args]
 ```
 
-`references/troubleshooting.md` explains the environment traps (they are real, they bite silently, and the scripts already work around them).
+`references/troubleshooting.md` lists the environment traps. They fail silently, and the scripts already work around them.
 
 ## The engine
 
-`scripts/vendor/` bundles the **video-use** helpers (MIT, Browser Use — see `scripts/vendor/LICENSE-video-use`): transcription, transcript packing, timeline views, cutting, grading and rendering. `references/cutting.md` documents how to drive them and the production rules that must not be broken.
-
-Motion graphics come from **HyperFrames** when it is installed (`/hyperframes` skills), otherwise from the bundled Python renderer. `references/graphics.md` covers both.
+`scripts/vendor/` bundles the **video-use** helpers (MIT, Browser Use). Motion graphics use **HyperFrames** when installed, otherwise the bundled renderer (`references/graphics.md`).
 
 ## Workflow
 
-### 1. Resume or start
+Work in this order. Each step exists because the next one needs its answer.
 
-If `<footage_dir>/edit/project.md` exists, summarize the last session in one sentence and ask whether to continue or start fresh. That file is the memory of every earlier decision — read it before changing anything.
+### 0. Resume
 
-### 2. Look at the footage first
+`<footage_dir>/edit/project.md` exists → summarize the last session in one sentence, ask whether to continue or start over.
 
-Never ask a single question before you have seen what you are working with — generic questions produce generic videos, and you cannot propose a hook if you don't know what the person says in the first ten seconds.
+### 1. Context — read the material
 
-- `ffprobe` each file: resolution **after rotation**, fps, duration, and every audio track.
-- Transcribe (`vendor/transcribe.py`), pack (`vendor/pack_transcripts.py`), and read the result.
-- Look at a few **full-resolution frames**, not only filmstrip thumbnails — thumbnails make perfectly readable screen recordings look unreadable, and that mistake changes the whole edit plan.
-- Note: stumbles, repeats, filler, dead air totals, and any name/address/key visible on screen.
+*Why: you cannot plan an edit for footage you have not seen, and every later question depends on knowing what is in it.*
 
-Transcription costs the user real money per video. Say so once, before the first one, and never re-transcribe a source you have already transcribed.
+Follow `references/context.md`:
 
-Then tell them what you found, in a few plain sentences: how long it is, how much of it is actual talking, what the shape of it is, and what problems you spotted.
+- Ask which transcription provider to use if it is not already in `brief.json` — `references/stt.md` has the comparison. Say once that transcription costs money per video, then never re-transcribe a cached source.
+- `vs.sh transcribe.py`, `vs.sh vendor/pack_transcripts.py`, `vs.sh footage_report.py`.
+- Read the transcript for topic, structure, proper nouns and weak spots. Pull three or four **full-resolution** frames and look at them.
+- Tell them in three sentences what you found, including any personal data visible on screen.
+- Ask only the three things the material cannot reveal: who it is for, what the viewer should do afterwards, and anything that must be spelled exactly or must not appear.
 
-### 3. Interview (the part that must never be skipped)
+### 2. Format — decide the frame
 
-Follow `references/intake.md`: three rounds of four questions, in the user's language, each option written around *their* footage and quoting *their* words with timestamps.
+*Why: captions, graphics and crops are all sized to the frame, so changing it later means rendering everything twice.*
 
-If they say "you decide", "sen hal qil", "just make it good" — use the defaults in that file, list them in one short block so nothing is a surprise, and move on. Confirming beats interrogating: an unsure person answers "I don't know" to every question, and that is a signal to decide for them, not to ask again.
+`references/formats.md`. Ask the aspect ratio explicitly, naming the source's own shape so the cheap option is obvious. Settle frame rate at the same time (keep the source rate for screen recordings and fast motion; 30 for talking heads). If the conversion would crop away something the video depends on, say so and offer a padded layout instead.
 
-### 4. Plan, then wait
+### 3. Style — decide how it should feel
 
-Describe the edit in 4–8 plain sentences: structure, what gets cut, what appears on screen and when, subtitle style, music, length. Wait for a yes. Editing before the plan is approved wastes an hour of rendering on the wrong video.
+*Why: this is the one creative decision they can make confidently, and it sets pace, graphics density, music level and caption size all at once.*
 
-### 5. Edit
+`references/styles.md`. Ask it as a feeling, map it to Professional / Creative / Documentary / Educational, and copy the preset into `brief.json`. If the footage argues against their choice — heavy shake with documentary pacing, dense screen text with a Creative graphics budget — say so once, then follow their call.
 
-Order matters; each step feeds the next:
+### 4. Details
 
-1. **Cut** — `references/cutting.md`. Word-boundary cuts, audited programmatically.
-2. **Reframe / zoom** — full-length reframed intermediates, referenced as extra sources.
-3. **Measure the real timeline** — `vs.sh offsets.py`. Frame rounding drifts the timeline; everything after this step is timed against the measured offsets, never the nominal EDL.
-4. **Graphics** — `references/graphics.md`. Staggered reveals, never two at once.
-5. **Subtitles** — `vs.sh captions.py`. Hand-correct names and technical terms first, and show the corrected lines before the final render.
-6. **Sound** — `references/audio.md`. `vs.sh synth_audio.py` then `vs.sh mix.py`.
-7. **Cover** — `vs.sh cover.py`, if they asked for one.
+*Why: the remaining choices are cheap to ask now and expensive to change after rendering.*
 
-### 6. Prove it is good before showing it
+`references/intake.md` covers what is left: hook, zooms, graphics level, caption style, music, sound effects, loudness target, cover. Anyone who says "you decide" gets the defaults — list them compactly so nothing is a surprise, then move on. An unsure person answering "I don't know" three times is telling you to decide for them.
 
-Run the gates in `references/quality-gates.md` on the rendered file. Fix, re-render, re-check — at most three rounds, then report what still fails instead of looping.
+### 5. Plan, and wait
 
-This is what separates a professional result from a plausible one: the cut that sounds fine to you may have a click at 12.3s and a caption 200ms late. Measure, don't assume.
+Four to eight plain sentences: structure, what gets cut, what appears on screen and when, captions, music, length. Wait for a yes.
 
-### 7. Deliver
+### 6. Edit
 
-- Send the video and cover with `SendUserFile`. Files over 30 MB show only in the desktop app — say so when it applies.
-- Report in plain language what you did, plus the measured numbers as evidence.
-- Raise anything that is the user's call: personal data visible on screen, borderline taste decisions, music licensing if they supplied a track.
-- Append a session entry to `<footage_dir>/edit/project.md`: what was decided, why, what was measured, what is left. The next session — maybe months later — starts by reading it.
+1. **Cut** — `references/cutting.md`. Word-boundary edges, audited in code.
+2. **Reframe** — full-length intermediates, referenced as extra sources.
+3. **Measure the timeline** — `vs.sh offsets.py`. Per-cut frame rounding drifts it; everything after this is timed against the measured offsets.
+4. **Graphics** — `references/graphics.md`. Staggered reveals.
+5. **Subtitles** — `vs.sh captions.py`, after showing your ASR corrections.
+6. **Sound** — `references/audio.md`. `vs.sh synth_audio.py`, then `vs.sh mix.py`.
+7. **Cover** — `vs.sh cover.py` if asked.
+
+### 7. Prove it
+
+`references/quality-gates.md` on the rendered file. Fix, re-render, re-check, at most three rounds, then report what still fails.
+
+The cut that sounds fine to you may click at 12.3 s and run captions 200 ms late. Measure.
+
+### 8. Deliver
+
+- `SendUserFile` the video and cover. Over 30 MB shows only in the desktop app — say so.
+- Report in plain language, with the measured numbers as evidence.
+- Raise what is theirs to decide: personal data on screen, borderline taste calls, music licensing for a supplied track.
+- Append to `edit/project.md`: decisions, reasoning, measurements, what is outstanding.
 
 ## Boundaries
 
-- All outputs go in `<footage_dir>/edit/`. Never write inside the skill directory; it may be read-only.
-- Never upload, publish or post the video anywhere. Hand the file to the user.
-- Never download music or stock footage from the internet. Use `synth_audio.py`, or a file the user provides.
-- If a person appears in the footage who plainly did not consent to being filmed, or the video shows someone else's personal data, flag it before delivery rather than quietly shipping it.
+- Outputs go in `<footage_dir>/edit/`. Never write inside the skill directory; it may be read-only.
+- Never upload, publish or post the video. Hand over the file.
+- Never download music or stock footage. Use `synth_audio.py` or a file they provide.
+- Flag, rather than quietly ship, footage showing someone else's personal data or a person who plainly did not agree to be filmed.

@@ -22,3 +22,21 @@ Run on the **rendered deliverable**, not on sources or intermediates. Report eac
 | 16 | Cover crops | `vs.sh cover.py` safe-band check + view the 4:5 crop | type fully inside 4:5 center band |
 
 Max 3 fix/re-render passes. If a gate still fails, ship nothing silently — report the failing gate, the number, and the options.
+
+
+## Input-side checks (before editing, from `footage_report.py`)
+
+These never block an edit. They decide what the edit has to compensate for, and they
+belong in the plan you show the user — a problem named up front is a craft decision,
+the same problem found afterwards is a complaint.
+
+| measure | when it matters | what it changes |
+|---|---|---|
+| camera motion (median px/s) | above ~60 | shorter shots; overlays must be motion-tracked, never static |
+| blur score | high / rising | do not punch in — zooming soft footage makes it softer |
+| highlight clipping % | above ~5 | do not lift exposure; the bright area is already gone |
+| average luma | below ~60 | gentle lift only; grading hard raises noise |
+| noise floor (dB) | above ~−50 | keep music quieter than the preset default |
+| integrated LUFS | below ~−20 | the source needs normalizing, say so before they hear it |
+| silence total | above ~5 s | this is where runtime comes from without losing content |
+| scene changes | any | natural section boundaries — cut on them rather than through them |

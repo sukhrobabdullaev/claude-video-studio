@@ -55,3 +55,13 @@ A mix mastered to −1.5 dBTP as WAV measures around −1.0 dBTP after AAC. Aim 
 ## Thumbnails lie about legibility
 
 A 10-frame filmstrip makes readable screen recordings look like mush. Before deciding that footage is unusable, unreadable or badly framed, extract a full-resolution frame and look at that.
+
+
+## `overlay=...:eof_action=pass` silently drops a still overlay
+
+A single-frame PNG ends after frame 1. With `eof_action=pass` the overlay filter then
+passes the main video straight through and the graphic never appears again — no error,
+no warning. A render can come back with a working title card and zero subtitles.
+
+Use `repeatlast=1` for stills, or hold the graphic in a full-length ProRes track (what
+`captions.py` and `track_box.py` produce), which never EOFs early.

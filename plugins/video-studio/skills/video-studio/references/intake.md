@@ -12,23 +12,27 @@ If they answer "you decide" at any point, stop asking, apply the defaults below,
 
 ---
 
-## Round 1 — Where it goes and what it's for
+Format (aspect ratio, frame rate) is settled in its own step — see `formats.md`. Style
+(pace, graphics density, music level) likewise — see `styles.md`. Both are asked before
+this point, because the answers here depend on them.
+
+## Round 1 — Scope
 
 | key | ask about | typical options |
 |---|---|---|
-| `platform` | where they'll post it | Reels/TikTok/Shorts (tall) · YouTube (wide) · LinkedIn/X · several |
 | `length` | how long | tight trim of what exists (~X s) · under 30s · under 60s · longer is fine |
-| `goal` | what the viewer should do or feel | learn something · trust them as an expert · click/buy/sign up · entertain |
-| `language` | subtitles | burned in, spoken language · plus English second line · separate file · none |
-
-## Round 2 — How it looks
-
-| key | ask about | typical options |
-|---|---|---|
 | `hook` | the first 2 seconds | teaser of the best visual, then the claim · start on the claim with a title card · a question on screen · straight in |
 | `zooms` | framing | reframe each shot to cut dead space · punch in on key moments · slow push on talking head · leave as filmed |
+| `language` | subtitles | burned in, spoken language · plus English second line · separate file · none |
+
+## Round 2 — On screen
+
+| key | ask about | typical options |
+|---|---|---|
 | `graphics` | on-screen labels | labels + boxes pointing at what matters · full: labels, boxes, text reveals, numbers · just one title card · none |
-| `caption_style` | subtitle look | small bold, 2 words at a time (recommended for tall video) · large punchy one word · sentence at the bottom · none |
+| `caption_style` | subtitle look | the style preset's default (recommended) · larger and punchier · sentence at the bottom · none |
+| `cover` | thumbnail | face + big title · screenshot proof + title · best frame, no text · none |
+| `brand` | colors, font, handle | reuse what's in project.md · brand colors they name · the default dark + orange · no branding |
 
 ## Round 3 — Sound and finish
 
@@ -37,7 +41,6 @@ If they answer "you decide" at any point, stop asking, apply the defaults below,
 | `music` | background music | original bed generated here, quiet under the voice · their own track (ask for the file) · none |
 | `sfx` | sound effects | subtle whooshes and ticks · punchy hits and risers · none |
 | `levels` | loudness | social standard, −14 LUFS · podcast, −16 · broadcast, −23 · match the source |
-| `cover` | thumbnail | face + big title · screenshot proof + title · best frame, no text · none |
 
 ## Style, asked once
 
@@ -45,7 +48,8 @@ If there is no brand in `edit/project.md` and they haven't mentioned one, ask in
 
 ## Defaults
 
-- vertical 1080×1920 @30 if the source is vertical, otherwise match the source
+- format: keep the source's shape; 30 fps for talking heads, source rate for screen recordings
+- style: Professional preset (`styles.md`)
 - tight trim: dead air down to ~150ms, stumbles and repeats removed, all content kept
 - subtitles burned in, spoken language, ASR errors hand-corrected
 - hook: open on the claim with a title card; add a 1–2s teaser only if a genuinely strong visual exists later

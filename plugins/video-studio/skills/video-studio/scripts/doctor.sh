@@ -42,11 +42,21 @@ else
   bad "bundled engine missing from scripts/vendor" "reinstall the skill"
 fi
 
-if grep -qE '^ELEVENLABS_API_KEY=.{10,}' "$VS_HOME/.env" 2>/dev/null || [ -n "${ELEVENLABS_API_KEY:-}" ]; then
-  pass "ElevenLabs key present"
+# Transcription needs word-level timing; any one of these three provides it.
+stt=""
+has_key() { grep -qE "^$1=.{10,}" "$VS_HOME/.env" 2>/dev/null || [ -n "${!1:-}" ]; }
+has_key ELEVENLABS_API_KEY && stt="$stt elevenlabs"
+has_key OPENAI_API_KEY && stt="$stt openai"
+"$VENV/bin/python" -c "import faster_whisper" 2>/dev/null && stt="$stt local"
+if [ -n "$stt" ]; then
+  pass "transcription:$stt"
 else
-  bad "no ElevenLabs key (needed to transcribe speech)" \
-      "user runs: printf 'ELEVENLABS_API_KEY=%s\\n' \"KEY\" > $VS_HOME/.env && chmod 600 $VS_HOME/.env"
+  bad "no transcription provider (word-level timing is required)" \
+      "one of:
+             printf 'ELEVENLABS_API_KEY=%s\\n' \"KEY\" > $VS_HOME/.env   (paid, diarization)
+             printf 'OPENAI_API_KEY=%s\\n' \"KEY\" >> $VS_HOME/.env      (paid, whisper-1)
+             uv pip install --python $VENV/bin/python faster-whisper  (free, offline)
+           see references/stt.md"
 fi
 
 if [ -f "$HOME/.claude/skills/hyperframes/SKILL.md" ]; then

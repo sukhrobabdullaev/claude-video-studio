@@ -27,7 +27,11 @@ These are not style preferences. Each one has a failure that is invisible until 
 inside = [w for w in words if w["start"] < edge < w["end"]]
 ```
 
-2. **Pad every edge 30–200ms.** Scribe timestamps drift 50–100ms; padding absorbs it.
+2. **Pad every edge 30–200ms.** ASR timestamps drift 50–100ms; padding absorbs it.
+   When the gap between two words is too narrow for 30ms on each side — a 40ms gap
+   before a stumble, say — take half the gap per side instead of skipping the cut, and
+   write the exception in the notes. The alternative is either cutting into a word or
+   leaving a repeat in, both worse than a tight but clean edge.
 3. **30ms audio fades at every segment boundary** — otherwise every cut clicks.
 4. **Extract per segment, then concat losslessly.** A single filtergraph re-encodes everything twice once overlays exist.
 5. **Subtitles composite last**, after every overlay, or graphics cover them.
@@ -54,3 +58,17 @@ ffmpeg -i src.mov -map 0:v:0 -map 0:a:0 \
 Copy the transcript to `transcripts/<source-key>.json` for each new source key, because captions resolve transcripts by source key. Keep the same duration and timebase so the EDL's times stay valid against either source.
 
 A cut that switches sources mid-motion (a whip pan, a hand crossing frame) hides itself completely; the same cut on a still frame is a visible jump. Use the motion the footage already has.
+
+
+## Frame rate
+
+Keep the source rate for screen recordings, gameplay and fast motion; drop to 30 for
+talking heads. Halving a 60 fps screen capture throws away the smoothness that made it
+worth recording, and doubling render time to keep it is usually worth it. Never raise a
+rate: interpolated frames look worse than honest ones.
+
+## A word you cannot make out
+
+Ask the user — they said it. If nobody is available to ask, leave the word out of the
+caption and note it; the sentence usually still reads. Burning a guess into the picture
+puts words in their mouth permanently, which is worse than a small gap.
