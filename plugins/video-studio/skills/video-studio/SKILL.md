@@ -49,7 +49,8 @@ Work in this order. Each step exists because the next one needs its answer.
 
 Follow `references/context.md`:
 
-- Ask which transcription provider to use if it is not already in `brief.json` — `references/stt.md` has the comparison. Say once that transcription costs money per video, then never re-transcribe a cached source.
+- Ask which transcription service they have a key for — ElevenLabs, OpenAI, Gemini, or none at all (there is a free offline option). `references/stt.md` has the comparison; the edit is identical whichever they pick. Store the choice in `brief.json`, say once that transcription costs money per video, and never re-transcribe a cached source.
+- Read the timing check that `transcribe.py` prints. If it reports an offset or invented timing, stop and fix that before planning anything — every cut and caption is built on those numbers.
 - `vs.sh transcribe.py`, `vs.sh vendor/pack_transcripts.py`, `vs.sh footage_report.py`.
 - Read the transcript for topic, structure, proper nouns and weak spots. Pull three or four **full-resolution** frames and look at them.
 - Tell them in three sentences what you found, including any personal data visible on screen.

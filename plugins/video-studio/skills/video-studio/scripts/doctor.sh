@@ -47,6 +47,7 @@ stt=""
 has_key() { grep -qE "^$1=.{10,}" "$VS_HOME/.env" 2>/dev/null || [ -n "${!1:-}" ]; }
 has_key ELEVENLABS_API_KEY && stt="$stt elevenlabs"
 has_key OPENAI_API_KEY && stt="$stt openai"
+has_key GEMINI_API_KEY && stt="$stt gemini"
 "$VENV/bin/python" -c "import faster_whisper" 2>/dev/null && stt="$stt local"
 if [ -n "$stt" ]; then
   pass "transcription:$stt"
@@ -55,6 +56,7 @@ else
       "one of:
              printf 'ELEVENLABS_API_KEY=%s\\n' \"KEY\" > $VS_HOME/.env   (paid, diarization)
              printf 'OPENAI_API_KEY=%s\\n' \"KEY\" >> $VS_HOME/.env      (paid, whisper-1)
+             printf 'GEMINI_API_KEY=%s\\n' \"KEY\" >> $VS_HOME/.env      (paid, timing is best-effort)
              uv pip install --python $VENV/bin/python faster-whisper  (free, offline)
            see references/stt.md"
 fi

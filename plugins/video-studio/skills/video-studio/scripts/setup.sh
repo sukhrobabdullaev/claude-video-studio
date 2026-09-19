@@ -47,10 +47,21 @@ echo "SKILL_DIR=$SKILL_DIR"
 echo "VS_HOME=$VS_HOME"
 echo "PYTHON=$VENV/bin/python"
 echo
-echo "Next: the ElevenLabs key (transcription). The user runs this in THEIR OWN terminal,"
-echo "so the key never goes through the chat transcript:"
+echo "Next: a transcription key. ASK THE USER which service they already have — any one"
+echo "of these works, and the edit is identical afterwards:"
 echo
-echo "    printf 'ELEVENLABS_API_KEY=%s\\n' \"PASTE_KEY_HERE\" > $VS_HOME/.env && chmod 600 $VS_HOME/.env"
+echo "  ElevenLabs  most accurate, speaker labels    ELEVENLABS_API_KEY"
+echo "  OpenAI      whisper-1, word timing           OPENAI_API_KEY"
+echo "  Gemini      word timing is best-effort       GEMINI_API_KEY"
+echo "  local       free, offline, no key at all     uv pip install faster-whisper"
+echo
+echo "They run this in THEIR OWN terminal, so the key never enters the chat transcript"
+echo "(swap in whichever variable name matches the service they chose):"
+echo
+echo "    printf 'ELEVENLABS_API_KEY=%s\\n' \"PASTE_KEY_HERE\" >> $VS_HOME/.env && chmod 600 $VS_HOME/.env"
+echo
+echo "Whatever they pick, transcribe.py checks the timing against the audio before"
+echo "anything is cut. See references/stt.md."
 echo
 echo "Optional, for richer motion graphics (needs Node 22+):"
 echo "    npx --yes hyperframes@latest skills update"

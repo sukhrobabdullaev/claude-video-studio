@@ -14,6 +14,7 @@ So the question to the user is not "which AI do you like" — it is "which of th
 |---|---|---|---|---|---|
 | **ElevenLabs** Scribe | yes | yes (diarization) | no | per minute of audio | — |
 | **OpenAI** `whisper-1` | yes (`timestamp_granularities:["word"]` + `verbose_json`) | no | no | per minute of audio | 25 MB upload |
+| **Gemini** | best effort via JSON schema | no | no | per minute of audio | see the warning below |
 | **local** faster-whisper | yes (`word_timestamps=True`) | no | yes | free after model download | slower; accuracy drops hard outside major languages |
 
 `transcribe.py` normalizes all three to the same JSON, so nothing downstream changes.
@@ -24,11 +25,49 @@ bash ${CLAUDE_SKILL_DIR}/scripts/vs.sh transcribe.py clip.mov --provider auto --
 
 `auto` picks the first available: ElevenLabs key → OpenAI key → local install.
 
-## Why Gemini is not in the list
+## Gemini: good words, invented times
 
-Gemini reads video and audio well, but its audio documentation specifies segment timestamps in `MM:SS` — one-second granularity, with no word-level guarantee. At one-second resolution a cut lands up to half a word early or late, so it cannot be the timing source here.
+Gemini is supported and it transcribes well. Its timing cannot be cut on. This was measured, not assumed — a 63-second Uzbek clip, run through both providers:
 
-If the user asks for Gemini specifically, explain this in one sentence and offer it for a different job: describing what is *visually* on screen. That is a real gap (the transcript only covers what is said), and it needs a `GEMINI_API_KEY`.
+| | Gemini 2.5 Flash | ElevenLabs Scribe |
+|---|---|---|
+| words returned | 142 | 142 |
+| text accuracy | near-identical (`bironta`/`birorta`, `man`/`men`) | reference |
+| word 8 timing | 3.55–3.90 s | 2.66–2.98 s |
+| timing check | **failed** (offset −260 ms, correlation 0.05, times running backwards) | passed |
+| `gemini-3-flash-preview` | **failed harder** — correlation 0.00, words timed past the end of the audio | — |
+
+Look at what the numbers describe: every Gemini word starts exactly where the previous one ended. There are no gaps, anywhere — and the clip has 7 seconds of silence in it. The model is spreading words evenly across the duration rather than reporting where they were heard, and by word 8 it has already drifted almost a second.
+
+So use Gemini for what it is good at:
+
+- **Text**: as a second opinion on a hard word, or on a language another provider mangles.
+- **Context**: it is the only option here that can describe what is *visually* on screen.
+
+And take the timing from ElevenLabs, OpenAI or local whisper. If Gemini is the only key available, say plainly that captions will drift and cuts will land inside words, and offer the free local provider as the timing source instead.
+
+Read the check the script prints after every transcription:
+
+```
+  timing check: words line up with the audio
+```
+
+If instead it reports an offset or "this timing is invented", the transcript is fine as *text* but must not drive cuts or captions. Offer to re-run with a provider that documents word timing, or to use the Gemini text with another provider's timing.
+
+Gemini is also the only option here that can describe what is *visually* on screen, which the transcript cannot. That is a genuine use for it even when another provider does the timing.
+
+## Every transcript is checked against the audio
+
+`transcribe.py` cross-correlates where the words claim to be against where sound actually is, and reports a constant offset or a complete mismatch. Measured on a 63-second clip with a known-good transcript:
+
+| transcript | verdict |
+|---|---|
+| unmodified | passes |
+| shifted 300 ms | caught, reported as `+300 ms` |
+| shifted 800 ms | caught |
+| 6-word `tiny` output | caught: "does not track the audio at any offset" |
+
+A silence-overlap test was tried first and proved useless on dense speech — with few long gaps, a transcript shifted by a whole second still lands nearly every word on top of speech. Correlation catches both the offset and the invented case.
 
 ## Local models are not equal across languages
 
