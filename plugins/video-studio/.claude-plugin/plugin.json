@@ -1,0 +1,17 @@
+{
+  "name": "video-studio",
+  "displayName": "Video Studio",
+  "description": "Professional video editing in Claude Code: intake interview first, then cuts, zooms, motion graphics, captions, music, balanced levels and a cover \u2014 verified against numeric quality gates.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Sukhrob Abdullaev"
+  },
+  "keywords": [
+    "video",
+    "editing",
+    "ffmpeg",
+    "captions",
+    "hyperframes",
+    "video-use"
+  ]
+}

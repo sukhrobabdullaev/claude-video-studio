@@ -1,0 +1,14 @@
+{
+  "name": "video-studio",
+  "owner": { "name": "Sukhrob Abdullaev" },
+  "description": "Conversation-driven professional video editing for Claude Code, built on video-use and HyperFrames.",
+  "plugins": [
+    {
+      "name": "video-studio",
+      "source": "./plugins/video-studio",
+      "description": "Drop raw footage, get an intake interview, then a professionally edited, level-checked video with captions, graphics, music and a cover.",
+      "category": "media",
+      "keywords": ["video", "editing", "ffmpeg", "captions", "hyperframes", "video-use"]
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "skill_name": "video-studio",
+  "note": "Each eval runs in a folder holding one ~60s vertical talking-head clip that also shows a screen recording, with its transcript pre-cached so runs cost no transcription credits. No human answers questions during a run, which also tests how the skill behaves when the user is unavailable. Supply your own clip to reproduce.",
+  "evals": [
+    {
+      "id": 0,
+      "name": "defaults-full-edit",
+      "prompt": "Shu papkadagi videoni professional montaj qilib ber. Men montajni bilmayman, shuning uchun hamma narsani o'zing hal qil — qanday yaxshi bo'lsa shunday qil. Instagram Reels uchun kerak.",
+      "expected_output": "Finished vertical MP4 in footage/edit/, dead air and stumbles cut, burned Uzbek subtitles, measured loudness reported, defaults listed compactly instead of blocking on questions.",
+      "assertions": [
+        "Produced a playable MP4 in outputs/",
+        "Output is vertical 9:16 (1080x1920)",
+        "Output is shorter than the 63.07s source, so dead air or stumbles were actually cut",
+        "Uzbek subtitles are burned into the picture",
+        "notes.md reports a measured loudness value in LUFS, not an estimate",
+        "questions.md is written in Uzbek, matching the language the user wrote in",
+        "Did not re-transcribe: edit/transcripts still holds exactly the one cached file",
+        "No cut lands inside a spoken word (no stuttered syllable at any cut)"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "stated-prefs",
+      "prompt": "Edit the video in this folder into a 9:16 reel under 45 seconds. I want burned-in Uzbek subtitles, quiet background music, and a title card on the opening claim. Don't ask me about those four things, I've decided them. Tell me the loudness numbers when you're done.",
+      "expected_output": "Honors all four stated preferences without re-asking, output under ~45s, music mixed under speech, loudness numbers reported from a measurement of the final file.",
+      "assertions": [
+        "Produced a playable MP4 in outputs/",
+        "Output duration is under 45 seconds",
+        "Output is vertical 9:16",
+        "Uzbek subtitles are burned in",
+        "Background music is present and sits below the voice",
+        "A title card appears over the opening claim",
+        "Loudness numbers are reported and come from measuring the final file",
+        "questions.md does not re-ask about aspect ratio, subtitles, music or the title card"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "subtitles-only",
+      "prompt": "just add uzbek subtitles to this video, nothing else. don't cut anything, don't add music.",
+      "expected_output": "Video with burned-in subtitles only. No cuts, no music, no graphics. Scope respected.",
+      "assertions": [
+        "Produced a playable MP4 in outputs/",
+        "Duration matches the 63.07s source within 0.5s, proving nothing was cut",
+        "Uzbek subtitles are burned in",
+        "No background music was added",
+        "No motion graphics, labels or highlight boxes were added",
+        "Scope was respected: the reply does not upsell extra editing as if it had been done"
+      ]
+    }
+  ]
+}
