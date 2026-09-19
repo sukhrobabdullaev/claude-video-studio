@@ -1,6 +1,6 @@
 # Video Studio for Claude Code
 
-Drop a raw video into Claude Code and say **"edit this video"**. Claude looks at the footage, interviews you about what you want (hook, zooms, graphics, subtitles, music, loudness, cover) **in your own language**, confirms a plan, edits it, and proves the result with measurements before showing it to you.
+Drop a raw video into Claude Code and say **"edit this video"**. Claude reads the material first — transcript, exposure, focus, camera shake, silences — then works through format, style and the remaining choices with you **in your own language**, confirms a plan, edits it, and proves the result with measurements before showing it to you.
 
 Built for people who are not editors. You describe the outcome; Claude makes the technical decisions and reports them afterwards.
 
@@ -13,13 +13,16 @@ Built for people who are not editors. You describe the outcome; Claude makes the
 - **Sound** — an original music bed generated on the spot (no downloads, no licensing risk), ducked under the voice, with effects placed on real transitions
 - **Cover / thumbnail** with text that survives the Instagram crop
 - **16 quality checks** before delivery: no pops at cuts, loudness on target, captions in sync, personal data on screen flagged
+- **Timing verified against the audio** — every transcript is cross-correlated with the sound, so a provider that invents word times is caught before anything is cut
 
 ## Requirements
 
 - **macOS**
 - **Claude Code** — the desktop app's Code tab or the `claude` CLI. The claude.ai chat cannot run this, because editing needs ffmpeg on your own machine.
 - **ffmpeg** and **uv** (`brew install ffmpeg uv`) — the setup step checks and tells you
-- An **ElevenLabs** API key with Speech-to-Text permission, for transcribing speech (paid per video)
+- A transcription option — whichever you already have:
+  - **ElevenLabs** (most accurate, speaker labels), **OpenAI** (`whisper-1`), **Gemini** (good text, unreliable timing — see `references/stt.md`), or
+  - **nothing at all**: `faster-whisper` runs free and offline on your Mac
 - Optional: **Node 22+** for richer motion graphics via [HyperFrames](https://github.com/heygen-com/hyperframes). Without it, graphics fall back to a bundled renderer.
 
 The editing engine itself is bundled — there is nothing else to clone.
@@ -86,17 +89,23 @@ Everything is written to `<your video folder>/edit/`. Your original file is neve
 plugins/video-studio/
   .claude-plugin/plugin.json
   skills/video-studio/
-    SKILL.md                    the workflow: look → interview → plan → edit → verify → deliver
+    SKILL.md                    context → format → style → details → plan → edit → verify → deliver
     references/
-      intake.md                 the interview, and the defaults for "you decide"
+      stt.md                    transcription providers, and which ones can be cut on
+      context.md                reading the material before asking anything
+      formats.md                aspect ratios, safe zones, frame-rate policy
+      styles.md                 Professional / Creative / Documentary / Educational, as numbers
+      intake.md                 the remaining questions, and the defaults for "you decide"
       cutting.md                cut rules that prevent silent damage
       graphics.md               HyperFrames and the bundled renderer, alpha handling
       audio.md                  mixing, ducking, loudness targets and why they are what they are
-      quality-gates.md          the 16 checks
+      quality-gates.md          the 16 output checks plus the input-side reading
       troubleshooting.md        environment traps that fail silently
     scripts/
       setup.sh, doctor.sh       install and preflight
       vs.sh                     runs any bundled script with the right environment
+      transcribe.py             four providers, one schema, timing checked against the audio
+      footage_report.py         exposure, focus, shake, scenes, silences, noise floor
       offsets.py                measures the real timeline (frame rounding drifts it)
       captions.py               frame-exact subtitles, no libass needed
       track_box.py              highlight boxes that follow handheld motion
@@ -114,4 +123,4 @@ The cutting and transcription engine in `scripts/vendor/` is [video-use](https:/
 
 ## License
 
-Not chosen yet. Until one is added, no reuse rights are granted for the original work in this repository; the bundled video-use files keep their own MIT license.
+MIT — see [LICENSE](LICENSE). The bundled video-use helpers in `scripts/vendor/` keep their own MIT license from Browser Use.
