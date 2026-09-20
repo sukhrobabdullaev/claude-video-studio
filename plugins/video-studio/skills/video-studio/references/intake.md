@@ -46,7 +46,7 @@ this point, because the answers here depend on them.
 
 ## Style, asked once
 
-If there is no brand in `edit/project.md` and they haven't mentioned one, ask in plain text: colors, font, and whether a handle or logo should appear. Otherwise propose near-black panels `#0A0A0A` with a single accent `#FF5A00`, Helvetica Bold titles, Menlo Bold for anything code-like — and say they can change it.
+If there is no brand in `edit/project.md` and they haven't mentioned one, ask in plain text: colors, font, and whether a handle or logo should appear. Otherwise propose near-black panels `#0A0A0A` with a single accent `#FF5A00`, and the bundled faces — Inter Bold for titles, JetBrains Mono Bold for anything code-like. Say they can change it; a `.ttf` path overrides either.
 
 ## Defaults
 
@@ -82,6 +82,6 @@ Save answers to `edit/brief.json` so a later session can pick up the same choice
   "sfx": "subtle",
   "levels": {"lufs": -14, "true_peak": -1.5},
   "cover": "face-title",
-  "brand": {"panel": "#0A0A0A", "accent": "#FF5A00", "title_font": "Helvetica Bold", "mono_font": "Menlo Bold"}
+  "brand": {"panel": "#0A0A0A", "accent": "#FF5A00", "title_font": "bundled", "mono_font": "bundled"}
 }
 ```

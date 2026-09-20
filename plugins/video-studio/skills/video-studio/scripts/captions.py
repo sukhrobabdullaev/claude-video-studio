@@ -17,9 +17,13 @@ import argparse
 import json
 import re
 import subprocess
+import sys
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from platform_paths import load_font  # noqa: E402
 
 PUNCT = set(".,!?;:")
 
@@ -70,8 +74,7 @@ def main() -> None:
     ap.add_argument("--width", type=int, default=1080)
     ap.add_argument("--height", type=int, default=1920)
     ap.add_argument("--fps", type=float, default=30)
-    ap.add_argument("--font", default="/System/Library/Fonts/Helvetica.ttc")
-    ap.add_argument("--font-index", type=int, default=1, help="1 = Helvetica Bold")
+    ap.add_argument("--font", help="override the bundled Inter Bold with a .ttf path")
     ap.add_argument("--size-max", type=int, default=72)
     ap.add_argument("--size-min", type=int, default=54)
     ap.add_argument("--stroke", type=int, default=7)
@@ -96,19 +99,25 @@ def main() -> None:
     max_w = W - 2 * a.margin
     bottom = H - a.bottom_from_edge
 
+    def face(size):
+        if a.font:
+            from PIL import ImageFont
+            return ImageFont.truetype(a.font, size)
+        return load_font("sans", size)
+
     def fit(text):
         for size in range(a.size_max, a.size_min - 1, -3):
-            f = ImageFont.truetype(a.font, size, index=a.font_index)
+            f = face(size)
             if f.getlength(text) + 2 * a.stroke <= max_w:
                 return f, [text]
         words = text.split()
         for k in range(len(words) - 1, 0, -1):
             lines = [" ".join(words[:k]), " ".join(words[k:])]
             for size in range(a.size_max, a.size_min - 1, -3):
-                f = ImageFont.truetype(a.font, size, index=a.font_index)
+                f = face(size)
                 if all(f.getlength(l) + 2 * a.stroke <= max_w for l in lines):
                     return f, lines
-        return ImageFont.truetype(a.font, a.size_min, index=a.font_index), [text]
+        return face(a.size_min), [text]
 
     def render(text):
         img = Image.new("RGBA", (W, H), (0, 0, 0, 0))

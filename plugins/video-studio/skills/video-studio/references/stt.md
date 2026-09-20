@@ -17,6 +17,12 @@ So the question to the user is not "which AI do you like" — it is "which of th
 | **Gemini** | best effort via JSON schema | no | no | per minute of audio | see the warning below |
 | **local** faster-whisper | yes (`word_timestamps=True`) | no | yes | free after model download | slower; accuracy drops hard outside major languages |
 
+Install the local option with the environment's own interpreter — `doctor.sh` / `doctor.ps1` prints the exact path for this machine:
+
+```
+uv pip install --python <that path> faster-whisper
+```
+
 `transcribe.py` normalizes all three to the same JSON, so nothing downstream changes.
 
 ```bash

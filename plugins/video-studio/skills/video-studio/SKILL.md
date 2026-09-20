@@ -20,14 +20,21 @@ They know how they want to come across; they do not know what a LUFS is. So ask 
 ## Setup
 
 ```bash
-bash ${CLAUDE_SKILL_DIR}/scripts/doctor.sh
+bash ${CLAUDE_SKILL_DIR}/scripts/doctor.sh          # macOS, Linux
+powershell -File ${CLAUDE_SKILL_DIR}\scripts\doctor.ps1   # Windows
 ```
 
-`FAIL` → run `scripts/setup.sh`, follow it, check again. Every bundled script runs through the wrapper, which loads the Python environment and any API keys:
+`FAIL` → run `setup.sh` / `setup.ps1`, follow what it prints, check again.
+
+Every bundled script runs through the wrapper, which finds the Python environment and loads any API keys:
 
 ```bash
 bash ${CLAUDE_SKILL_DIR}/scripts/vs.sh <script> [args]
 ```
+
+**On Windows, `vs.ps1` replaces `vs.sh` everywhere in this skill** — `powershell -File ${CLAUDE_SKILL_DIR}\scripts\vs.ps1 <script> [args]`. The scripts themselves are identical on all three platforms; only the two wrappers differ. Anything platform-specific (where the environment lives, how ffmpeg is installed, which fonts are used) is resolved in `scripts/platform_paths.py`, so nothing else branches on the operating system.
+
+Fonts are bundled (Inter Bold, JetBrains Mono Bold, both OFL), so a caption renders the same on every machine and Uzbek `o'` / `g'` are guaranteed present.
 
 `references/troubleshooting.md` lists the environment traps. They fail silently, and the scripts already work around them.
 

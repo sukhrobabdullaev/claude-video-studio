@@ -13,9 +13,13 @@ Pick --frame from a contact sheet of ~8 candidates: eye contact, mouth near-clos
 from __future__ import annotations
 
 import argparse
+import sys
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
+from PIL import Image, ImageDraw, ImageEnhance, ImageFilter
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from platform_paths import load_font  # noqa: E402
 
 
 def hexrgb(h):
@@ -34,10 +38,8 @@ def main():
     ap.add_argument("--accent", default="#FF5A00")
     ap.add_argument("--width", type=int, default=1080)
     ap.add_argument("--height", type=int, default=1920)
-    ap.add_argument("--title-font", default="/System/Library/Fonts/Helvetica.ttc")
-    ap.add_argument("--title-index", type=int, default=1)
-    ap.add_argument("--mono-font", default="/System/Library/Fonts/Menlo.ttc")
-    ap.add_argument("--mono-index", type=int, default=1)
+    ap.add_argument("--title-font", help="override the bundled Inter Bold with a .ttf")
+    ap.add_argument("--mono-font", help="override the bundled JetBrains Mono Bold")
     a = ap.parse_args()
 
     W, H = a.width, a.height
@@ -61,8 +63,14 @@ def main():
 
     layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     d = ImageDraw.Draw(layer)
-    title = lambda sz: ImageFont.truetype(a.title_font, sz, index=a.title_index)
-    mono = lambda sz: ImageFont.truetype(a.mono_font, sz, index=a.mono_index)
+    def _face(kind, override, sz):
+        if override:
+            from PIL import ImageFont
+            return ImageFont.truetype(override, sz)
+        return load_font(kind, sz)
+
+    title = lambda sz: _face("sans", a.title_font, sz)
+    mono = lambda sz: _face("mono", a.mono_font, sz)
 
     size = int(W * 0.146)
     longest = max([a.line1, a.line2], key=lambda t: title(size).getlength(t))

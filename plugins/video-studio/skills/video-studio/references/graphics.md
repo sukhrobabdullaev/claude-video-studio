@@ -20,6 +20,15 @@ Run a script you wrote through the same wrapper — the system `python3` has no 
 ```bash
 cd <footage dir>
 bash ${CLAUDE_SKILL_DIR}/scripts/vs.sh edit/animations/slot_1/make_card.py
+# Windows: powershell -File ${CLAUDE_SKILL_DIR}\scripts\vs.ps1 edit\animations\slot_1\make_card.py
+```
+
+Inside such a script, take fonts from the platform layer rather than hardcoding a path — the bundled faces exist on every machine, system fonts do not:
+
+```python
+import sys; sys.path.insert(0, "<skill>/scripts")
+from platform_paths import load_font
+title, label = load_font("sans", 72), load_font("mono", 34)
 ```
 
 A bare name means a bundled script; anything with a slash is your own, and resolves from the current directory — so either `cd` to the footage folder first or pass an absolute path.

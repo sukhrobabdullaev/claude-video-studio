@@ -17,15 +17,17 @@ Built for people who are not editors. You describe the outcome; Claude makes the
 
 ## Requirements
 
-- **macOS**
-- **Claude Code** — the desktop app's Code tab or the `claude` CLI. The claude.ai chat cannot run this, because editing needs ffmpeg on your own machine.
-- **ffmpeg** and **uv** (`brew install ffmpeg uv`) — the setup step checks and tells you
+- **macOS, Windows or Linux**
+- **Claude Code** — normally the desktop app (the Code tab). The `claude` CLI works too. The claude.ai chat cannot run this, because editing needs ffmpeg on your own machine.
+- **ffmpeg** and **uv** — the setup step checks for them and prints the right install command for your system (`brew`, `winget`, `apt`, `dnf` or `pacman`)
 - A transcription option — whichever you already have:
   - **ElevenLabs** (most accurate, speaker labels), **OpenAI** (`whisper-1`), **Gemini** (good text, unreliable timing — see `references/stt.md`), or
   - **nothing at all**: `faster-whisper` runs free and offline on your Mac
 - Optional: **Node 22+** for richer motion graphics via [HyperFrames](https://github.com/heygen-com/hyperframes). Without it, graphics fall back to a bundled renderer.
 
-The editing engine itself is bundled — there is nothing else to clone.
+The editing engine is bundled, and so are the fonts (Inter and JetBrains Mono, both OFL) — a caption renders identically on every machine, and there is nothing else to clone.
+
+Windows runs natively: the wrappers are PowerShell, everything behind them is the same Python as on macOS and Linux. WSL is not required.
 
 ## Install
 
@@ -38,7 +40,7 @@ Restart Claude Code, then say:
 
 > set up video studio
 
-It checks what is missing, asks before installing anything, and gives you a terminal command for the API key so the key never passes through the chat. Setup is done when the check prints `READY`.
+It checks what is missing, asks before installing anything, and hands you one command for the API key so the key never passes through the chat — paste it into the desktop app's **Terminal** tab, beside the conversation. Setup is done when the check prints `READY`.
 
 Updating later:
 
