@@ -1,6 +1,8 @@
 # The interview
 
-Three `AskUserQuestion` calls, four questions each, **in the user's own language**.
+Three `AskUserQuestion` calls, up to four questions each, **in the user's own language**.
+
+Format and style are settled before this point in their own steps, so what is left here is one round of scope, one of on-screen choices, and one of sound and finish. Drop any question the user has already answered in their request — re-asking something they just told you reads as not listening.
 
 Two things make the difference between a useful interview and an annoying one:
 

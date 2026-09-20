@@ -15,5 +15,16 @@ PY="$VS_HOME/venv/bin/python"
 [ -x "$PY" ] || { echo "python env missing — run: bash $SKILL_DIR/scripts/setup.sh" >&2; exit 1; }
 if [ -f "$VS_HOME/.env" ]; then set -a; . "$VS_HOME/.env"; set +a; fi
 
+# A bare name is one of the bundled scripts; anything with a slash is a path the
+# caller wrote themselves (the graphics workflow tells you to write PIL scripts, and
+# they need this same interpreter — the system python has no Pillow).
 script="$1"; shift
-exec "$PY" "$SKILL_DIR/scripts/$script" "$@"
+if [ -f "$SKILL_DIR/scripts/$script" ]; then
+  exec "$PY" "$SKILL_DIR/scripts/$script" "$@"
+elif [ -f "$script" ]; then
+  exec "$PY" "$script" "$@"
+else
+  echo "no such script: $script" >&2
+  echo "bundled scripts: $(cd "$SKILL_DIR/scripts" && ls *.py | tr '\n' ' ')" >&2
+  exit 1
+fi

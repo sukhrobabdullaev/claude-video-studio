@@ -65,3 +65,16 @@ no warning. A render can come back with a working title card and zero subtitles.
 
 Use `repeatlast=1` for stills, or hold the graphic in a full-length ProRes track (what
 `captions.py` and `track_box.py` produce), which never EOFs early.
+
+
+## `render.py` re-extracts every segment on a second pass
+
+It does not reuse `clips_graded/` even when nothing about the cut changed, so a
+second render of a 60-second clip pays the full extract-and-concat again — around a
+minute wasted, on a workflow that is deliberately two passes (measure offsets, then
+composite).
+
+When only overlays or audio changed, skip the re-extract: keep the `base.mp4` from the
+first pass and run the composite step's own ffmpeg command against it. Write the
+overlays into `edl.json` anyway, so a plain `render.py edl.json` still reproduces the
+result from scratch later.

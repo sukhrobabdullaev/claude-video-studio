@@ -13,7 +13,15 @@ bash ${CLAUDE_SKILL_DIR}/scripts/to_prores.sh render.webm render.mov
 
 When several graphics are needed, build them in parallel sub-agents (one per graphic, each prompt self-contained with exact pixel specs, palette, font paths and a frame-by-frame timeline) — sequential builds waste wall-clock for no benefit. For mechanical variations of one design, a single script that loops is better than several agents: consistency comes free.
 
-**PIL fallback** (always available) is right for label cards, highlight boxes, lower thirds and anything geometric. `track_box.py` is already this. Pipe RGBA frames straight into ProRes:
+**PIL fallback** (always available) is right for label cards, highlight boxes, lower thirds and anything geometric. `track_box.py` is already this.
+
+Run a script you wrote through the same wrapper — the system `python3` has no Pillow, and the wrapper takes a path as readily as a bundled name:
+
+```bash
+bash ${CLAUDE_SKILL_DIR}/scripts/vs.sh edit/animations/slot_1/make_card.py
+```
+
+Pipe RGBA frames straight into ProRes:
 
 ```python
 p = subprocess.Popen(["ffmpeg","-y","-f","rawvideo","-pix_fmt","rgba","-s",f"{W}x{H}",

@@ -5,7 +5,7 @@ Run on the **rendered deliverable**, not on sources or intermediates. Report eac
 | # | gate | how | pass |
 |---|---|---|---|
 | 1 | Spec | `ffprobe` width, height, fps, pix_fmt, audio codec/channels | matches `brief.json` output; yuv420p; AAC 48k stereo |
-| 2 | Duration | `ffprobe` vs sum of measured offsets | within ±1 frame of expected (plus any overlay tail) |
+| 2 | Duration | the **video stream** duration (`-select_streams v:0 -show_entries stream=duration`) vs the sum of measured offsets | within ±1 frame. Do not use the container duration: AAC padding makes it read a few frames longer and a clean render looks like a failure |
 | 3 | No cut inside a word | programmatic audit of every EDL range edge against transcript words | 0 edges strictly inside a word (muted cold-open ranges exempt, documented) |
 | 4 | No audio pops | `vs.sh check_boundaries.py` | every boundary transient ratio ≤ 6, except boundaries with an intentional SFX hit (listed) |
 | 5 | Integrated loudness | `vs.sh mix.py` output or `loudnorm print_format=summary` on the final file | target ±0.5 LU |

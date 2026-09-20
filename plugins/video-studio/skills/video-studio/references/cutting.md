@@ -6,12 +6,14 @@ The bundled engine (`scripts/vendor/`, from video-use, MIT) reads the video as t
 
 ```bash
 V=${CLAUDE_SKILL_DIR}/scripts/vs.sh
-bash $V vendor/transcribe.py <video> --audio-track 0      # word-level, cached
+bash $V transcribe.py <video> --audio-track 0             # word-level, cached, timing-checked
 bash $V vendor/pack_transcripts.py --edit-dir <dir>/edit  # -> takes_packed.md
 bash $V vendor/timeline_view.py <video> <start> <end>     # filmstrip + waveform PNG
 bash $V vendor/render.py <edl.json> -o out.mp4 --fps 30 --no-subtitles --no-loudnorm
 bash $V offsets.py --edl <edl.json>                       # measured output timeline
 ```
+
+Use `transcribe.py`, not `vendor/transcribe.py`. The vendored one is ElevenLabs-only, has no cache check and no timing check, so calling it directly can spend money on a transcript you already have.
 
 `--audio-track 0` matters: iPhone clips carry a second 4-channel spatial track, and ffmpeg otherwise picks the track with the most channels — you would transcribe room ambience instead of the voice.
 

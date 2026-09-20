@@ -15,6 +15,8 @@ State the source's own shape when you ask — "sizning videongiz vertikal (1080�
 
 Frame rate: **keep the source rate** for screen recordings, gameplay and anything with fast motion — halving 60 fps throws away the smoothness that made it worth recording. Use 30 for talking heads, where it halves the render time and nobody can tell. Never *raise* the rate; interpolated frames look worse than honest ones.
 
+A phone filming a screen is both at once, and the answer is 30: the camera is already the limiting factor, the screen's own refresh is lost to the lens regardless, and the handheld motion at 60 costs double the render for smoothness the footage never had. Keep 60 only when the screen content itself moves fast enough to smear — scrolling code, a game, a fast cursor drag.
+
 Encoding: H.264 High, `yuv420p`, CRF 18–20 for a master, `+faststart` so it starts playing before it finishes downloading. Platforms re-encode to 3–5 Mbps anyway, so a clean master matters more than a small file.
 
 ## Safe zones

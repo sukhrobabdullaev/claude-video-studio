@@ -320,6 +320,23 @@ def via_local(audio: Path, language: str | None, model_size: str) -> dict:
 
 # ---------------------------------------------------------------- main
 
+def report_timing(video: Path, words: list[dict], track: int) -> bool:
+    """Run the timing check and print the verdict. True when the timing is usable."""
+    duration = float(run(["ffprobe", "-v", "error", "-show_entries", "format=duration",
+                          "-of", "csv=p=0", str(video)]).stdout.strip() or 0)
+    problems = check_timing(video, words, duration, track)
+    if problems:
+        print("\n  TIMING CHECK FAILED:")
+        for pr in problems:
+            print(f"   - {pr}")
+        print("  Do not cut on these timings. Captions would drift and cuts would land "
+              "mid-word.\n  Use a provider with documented word-level output "
+              "(elevenlabs, openai, local) for the cut.")
+        return False
+    print("  timing check: words line up with the audio")
+    return True
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -342,9 +359,14 @@ def main() -> None:
     out_path = edit_dir / "transcripts" / f"{a.video.stem}.json"
     if out_path.exists() and not a.force:
         cached = json.loads(out_path.read_text())
-        n = len([w for w in cached.get("words", []) if w.get("type") == "word"])
-        print(f"cached: {out_path} ({n} words, provider={cached.get('provider','elevenlabs')})")
+        words = [w for w in cached.get("words", []) if w.get("type") == "word"]
+        print(f"cached: {out_path} ({len(words)} words, "
+              f"provider={cached.get('provider', 'elevenlabs')})")
         print("nothing re-transcribed, nothing charged")
+        # The cache is the common path, so skipping the timing check here would mean
+        # the check almost never runs — including on a transcript produced by some
+        # earlier tool with no timing guarantees at all.
+        report_timing(a.video, words, a.audio_track)
         return
 
     tracks = audio_track_count(a.video)
@@ -382,20 +404,7 @@ def main() -> None:
     print(f"{len(words)} words, speech {words[0]['start']:.2f}–{words[-1]['end']:.2f}s "
           f"({span:.1f}s), language={payload.get('language_code')}")
 
-    problems = check_timing(a.video, words, 
-                            float(run(["ffprobe", "-v", "error", "-show_entries",
-                                       "format=duration", "-of", "csv=p=0",
-                                       str(a.video)]).stdout.strip() or 0),
-                            a.audio_track)
-    if problems:
-        print("\n  TIMING CHECK FAILED:")
-        for pr in problems:
-            print(f"   - {pr}")
-        print("  Do not cut on these timings. Captions would drift and cuts would land "
-              "mid-word.\n  Use a provider with documented word-level output "
-              "(elevenlabs, openai, local) for the cut.")
-    else:
-        print("  timing check: words line up with the audio")
+    report_timing(a.video, words, a.audio_track)
 
     # A transcript far too sparse for the runtime means the model misheard the language
     # rather than that the speaker was quiet. Caught here it costs nothing; caught after
