@@ -19,6 +19,31 @@ Use `transcribe.py`, not `vendor/transcribe.py`. The vendored one is ElevenLabs-
 
 Use `--no-loudnorm` whenever music will be mixed in later, so loudness is set once on the finished mix rather than twice.
 
+`--no-subtitles` is right even when the video has subtitles: this ffmpeg has no libass, so the built-in subtitle path cannot run. Captions arrive as a normal overlay instead — `captions.py` writes a full-length transparent track, and you list it **last** in `overlays` so nothing covers it.
+
+**Never name the output `base.mp4`.** `render.py` uses that name for its own concat result, so `-o base.mp4` makes ffmpeg read and write one file and dies with exit 234 and a traceback that blames ffmpeg rather than the collision. You pay a full re-extraction to find out.
+
+## The EDL
+
+```json
+{
+  "version": 1,
+  "sources": {"main": "/abs/path/clip.mov", "punch": "edit/punch/demo.mp4"},
+  "grade": "eq=contrast=1.05:saturation=1.03",
+  "ranges": [
+    {"source": "main", "start": 0.43, "end": 7.86, "beat": "HOOK",
+     "quote": "...", "note": "why this edge is here"}
+  ],
+  "overlays": [
+    {"file": "animations/label_1.mov", "start_in_output": 7.6, "duration": 3.2},
+    {"file": "captions.mov", "start_in_output": 0.0, "duration": 55.9}
+  ],
+  "subtitles": "master.srt"
+}
+```
+
+`overlays[].file` and `subtitles` resolve **relative to the edit directory** — write `animations/x.mov`, not `edit/animations/x.mov`. `start_in_output` is a time on the finished timeline, so it comes from `offsets.py`, never from the nominal EDL arithmetic. Overlays composite in list order: last one wins, which is why captions go at the end.
+
 ## Rules that cause silent damage when broken
 
 These are not style preferences. Each one has a failure that is invisible until someone watches the result.

@@ -78,3 +78,14 @@ When only overlays or audio changed, skip the re-extract: keep the `base.mp4` fr
 first pass and run the composite step's own ffmpeg command against it. Write the
 overlays into `edl.json` anyway, so a plain `render.py edl.json` still reproduces the
 result from scratch later.
+
+
+## `render.py -o base.mp4` dies with exit 234
+
+`render.py` concatenates its segments into `base.mp4` inside the edit directory. Ask it
+to *write* `base.mp4` and the final copy step runs ffmpeg with the same file as input
+and output, which fails with exit 234 and a traceback that points at ffmpeg rather than
+at the name collision.
+
+Name the output anything else — `final.mp4`, `preview.mp4`, `video_pro.mp4`. The same
+applies to `base_draft.mp4` and `base_preview.mp4` in draft and preview modes.

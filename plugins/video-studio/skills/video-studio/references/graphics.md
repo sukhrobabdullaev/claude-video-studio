@@ -18,8 +18,11 @@ When several graphics are needed, build them in parallel sub-agents (one per gra
 Run a script you wrote through the same wrapper — the system `python3` has no Pillow, and the wrapper takes a path as readily as a bundled name:
 
 ```bash
+cd <footage dir>
 bash ${CLAUDE_SKILL_DIR}/scripts/vs.sh edit/animations/slot_1/make_card.py
 ```
+
+A bare name means a bundled script; anything with a slash is your own, and resolves from the current directory — so either `cd` to the footage folder first or pass an absolute path.
 
 Pipe RGBA frames straight into ProRes:
 
