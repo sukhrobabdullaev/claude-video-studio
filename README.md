@@ -48,6 +48,29 @@ Updating later:
 /plugin marketplace update video-studio
 ```
 
+### Windows, step by step
+
+Claude Code runs natively on Windows 10 1809+ and is built into the Claude desktop app, so there is no terminal work beyond two install commands.
+
+1. **Claude desktop app** — download from [claude.com/download](https://claude.com/download), sign in (Claude Code needs a Pro, Max, Team or Enterprise plan — the free plan does not include it), and open the **Code** tab.
+2. **Two tools**, pasted into the app's Terminal tab:
+
+   ```powershell
+   winget install Gyan.FFmpeg
+   winget install astral-sh.uv
+   ```
+
+   Python is *not* required — `uv` brings its own.
+3. **Install the plugin** in the Code tab:
+
+   ```
+   /plugin marketplace add sukhrobabdullaev/claude-video-studio
+   /plugin install video-studio@video-studio
+   ```
+4. Restart the app, then say **"set up video studio"** and answer its questions.
+
+Git for Windows is optional. Without it Claude Code uses PowerShell, which is why this plugin ships PowerShell wrappers (`vs.ps1`, `doctor.ps1`, `setup.ps1`) alongside the bash ones.
+
 ### Without GitHub
 
 Copy this folder to the machine, then:
