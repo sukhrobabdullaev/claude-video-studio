@@ -372,7 +372,11 @@ def concat_segments(segment_paths: list[Path], out_path: Path, edit_dir: Path) -
     """Lossless concat via the concat demuxer. No re-encode."""
     out_path.parent.mkdir(parents=True, exist_ok=True)
     concat_list = edit_dir / "_concat.txt"
-    concat_list.write_text("".join(f"file '{p.resolve()}'\n" for p in segment_paths))
+    # LOCAL PATCH (see vendor/PATCHES.md): forward slashes, always. Inside the concat
+    # demuxer's file directive a backslash is an escape character, so a Windows path
+    # like C:\Users\... is mangled and ffmpeg reports "No such file or directory".
+    concat_list.write_text(
+        "".join("file '%s'\n" % str(p.resolve()).replace("\\", "/") for p in segment_paths))
 
     cmd = [
         "ffmpeg", "-y",

@@ -45,7 +45,9 @@ def step(name: str):
 def run(cmd: list[str], **kw) -> str:
     r = subprocess.run([str(c) for c in cmd], capture_output=True, text=True, **kw)
     if r.returncode:
-        raise RuntimeError((r.stderr or r.stdout).strip()[:300])
+        # The useful part of a traceback is its last lines, not its first.
+        msg = (r.stderr or r.stdout).strip().splitlines()
+        raise RuntimeError(" | ".join(msg[-3:])[:400] if msg else "no output")
     return (r.stdout or "") + (r.stderr or "")
 
 
