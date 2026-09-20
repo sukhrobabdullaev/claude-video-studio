@@ -12,6 +12,11 @@ set -euo pipefail
 
 VS_HOME="${VS_HOME:-$HOME/.video-studio}"
 SKILL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+# Windows consoles default to a legacy code page, so any script printing an arrow or
+# an em dash dies with UnicodeEncodeError. UTF-8 mode makes output identical on all
+# three platforms; it is a no-op where UTF-8 is already the default.
+export PYTHONUTF8=1 PYTHONIOENCODING=utf-8
 PY="$VS_HOME/venv/bin/python"
 
 [ -x "$PY" ] || { echo "python env missing — run: bash $SKILL_DIR/scripts/setup.sh" >&2; exit 1; }

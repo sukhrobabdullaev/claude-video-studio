@@ -6,6 +6,12 @@
 # Both venv layouts are accepted so this also runs under PowerShell on macOS and
 # Linux — which is how it gets tested away from a Windows machine.
 $dir = Split-Path -Parent $MyInvocation.MyCommand.Path
+# Windows consoles default to a legacy code page, so any script printing an arrow or
+# an em dash dies with UnicodeEncodeError. UTF-8 mode makes output identical on all
+# three platforms.
+$env:PYTHONUTF8 = "1"
+$env:PYTHONIOENCODING = "utf-8"
+
 $vsHome = if ($env:VS_HOME) { $env:VS_HOME } else { Join-Path $HOME ".video-studio" }
 
 $py = $null

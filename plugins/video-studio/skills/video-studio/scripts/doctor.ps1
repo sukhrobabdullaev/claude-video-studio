@@ -1,5 +1,11 @@
 # Thin bootstrap for Windows. The checks live in doctor.py.
 $dir = Split-Path -Parent $MyInvocation.MyCommand.Path
+# Windows consoles default to a legacy code page, so any script printing an arrow or
+# an em dash dies with UnicodeEncodeError. UTF-8 mode makes output identical on all
+# three platforms.
+$env:PYTHONUTF8 = "1"
+$env:PYTHONIOENCODING = "utf-8"
+
 $script = Join-Path $dir "doctor.py"
 $vsHome = if ($env:VS_HOME) { $env:VS_HOME } else { Join-Path $HOME ".video-studio" }
 $venvPy = Join-Path $vsHome "venv\Scripts\python.exe"

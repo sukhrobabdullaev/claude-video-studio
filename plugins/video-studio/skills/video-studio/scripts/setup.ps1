@@ -1,6 +1,12 @@
 # Thin bootstrap for Windows. The install logic lives in setup.py.
 # No system Python needed: uv brings its own when none is installed.
 $dir = Split-Path -Parent $MyInvocation.MyCommand.Path
+# Windows consoles default to a legacy code page, so any script printing an arrow or
+# an em dash dies with UnicodeEncodeError. UTF-8 mode makes output identical on all
+# three platforms.
+$env:PYTHONUTF8 = "1"
+$env:PYTHONIOENCODING = "utf-8"
+
 $script = Join-Path $dir "setup.py"
 
 $py = Get-Command py -ErrorAction SilentlyContinue
