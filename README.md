@@ -68,6 +68,13 @@ Claude Code runs natively on Windows 10 1809+ and is built into the Claude deskt
    /plugin install video-studio@video-studio
    ```
 4. Restart the app, then say **"set up video studio"** and answer its questions.
+5. Confirm it works — ask Claude to *run the video-studio selftest*, or paste this into the Terminal tab:
+
+   ```powershell
+   powershell -File "$env:USERPROFILE\.claude\plugins\...\scripts\vs.ps1" selftest.py
+   ```
+
+   It builds a test clip and exercises every script. `14/14 passed` means the install is sound.
 
 Git for Windows is optional. Without it Claude Code uses PowerShell, which is why this plugin ships PowerShell wrappers (`vs.ps1`, `doctor.ps1`, `setup.ps1`) alongside the bash ones.
 
@@ -139,8 +146,21 @@ plugins/video-studio/
       check_boundaries.py       audio pop detection
       cover.py                  cover art with crop-safe text
       to_prores.sh              transparent overlays that survive compositing
+      selftest.py               builds a clip and exercises every script (14 checks)
       vendor/                   bundled editing engine (video-use, MIT)
 ```
+
+## Verifying an install
+
+```bash
+bash  <skill>/scripts/vs.sh  selftest.py     # macOS, Linux
+pwsh -File <skill>\scripts\vs.ps1 selftest.py   # Windows
+```
+
+No API calls, no footage, about six seconds. It generates a synthetic clip and runs the
+report, the render, the offsets, the captions, the fonts, the audio synthesis, the mix,
+the pop detector, the motion tracker, the alpha conversion and the cover. Expect
+`14/14 passed`.
 
 ## Credits
 

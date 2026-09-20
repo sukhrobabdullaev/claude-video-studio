@@ -36,6 +36,14 @@ bash ${CLAUDE_SKILL_DIR}/scripts/vs.sh <script> [args]
 
 Fonts are bundled (Inter Bold, JetBrains Mono Bold, both OFL), so a caption renders the same on every machine and Uzbek `o'` / `g'` are guaranteed present.
 
+To prove the whole chain works on this machine — every script, no API calls, about six seconds — run the smoke test. It builds its own clip, so it needs no footage and spends no credits:
+
+```bash
+bash ${CLAUDE_SKILL_DIR}/scripts/vs.sh selftest.py
+```
+
+Anything other than `14/14 passed` is a broken install; the failing line names the script.
+
 `references/troubleshooting.md` lists the environment traps. They fail silently, and the scripts already work around them.
 
 ## The engine

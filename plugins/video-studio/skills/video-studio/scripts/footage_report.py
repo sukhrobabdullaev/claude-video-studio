@@ -110,14 +110,25 @@ def sound(video: Path, track: int = 0) -> dict:
               "-f", "null", "-"])
     starts = [float(x) for x in re.findall(r"silence_start: ([-\d.]+)", out)]
     durs = [float(x) for x in re.findall(r"silence_duration: ([\d.]+)", out)]
+    def number(text: str, label: str):
+        """ffmpeg prints '-inf' or a bare '-' for digital silence, so a match is not
+        the same as a number. Returning None keeps the report honest instead of
+        crashing on a clip with a muted stretch."""
+        m = re.search(rf"{label}:\s*(-?\d+(?:\.\d+)?|-?inf)", text)
+        if not m:
+            return None
+        try:
+            v = float(m.group(1))
+        except ValueError:
+            return None
+        return round(v, 1) if v == v and abs(v) != float("inf") else None
+
     def grab(label):
-        m = re.search(rf"{label}:\s*([-\d.]+)", out)
-        return round(float(m.group(1)), 1) if m else None
+        return number(out, label)
     loud = sh(["ffmpeg", "-v", "info", "-i", str(video), "-map", f"0:a:{track}",
                "-af", "loudnorm=I=-14:TP=-1.5:LRA=11:print_format=summary", "-f", "null", "-"])
     def loudval(label):
-        m = re.search(rf"{label}:\s*([-\d.]+)", loud)
-        return round(float(m.group(1)), 1) if m else None
+        return number(loud, label)
     return {
         "silence_count": len(durs),
         "silence_total_s": round(sum(durs), 2),
