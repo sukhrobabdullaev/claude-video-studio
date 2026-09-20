@@ -1,0 +1,82 @@
+name: selftest
+
+# Proves the plugin installs and runs on all three platforms. Windows matters most:
+# it is the one the author cannot test locally, and the wrappers there are PowerShell.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  selftest:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install ffmpeg (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Install ffmpeg (macOS)
+        if: runner.os == 'macOS'
+        run: brew install ffmpeg
+
+      - name: Install ffmpeg (Windows)
+        if: runner.os == 'Windows'
+        run: choco install ffmpeg -y --no-progress
+
+      - name: Install uv (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Install uv (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          irm https://astral.sh/uv/install.ps1 | iex
+          "$env:USERPROFILE\.local\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        shell: pwsh
+
+      - name: Report what the tools see
+        run: |
+          ffmpeg -version
+          uv --version
+        shell: bash
+
+      - name: Setup (Unix)
+        if: runner.os != 'Windows'
+        run: bash plugins/video-studio/skills/video-studio/scripts/setup.sh
+
+      - name: Setup (Windows)
+        if: runner.os == 'Windows'
+        run: pwsh -File plugins\video-studio\skills\video-studio\scripts\setup.ps1
+        shell: pwsh
+
+      # doctor reports FAIL for the missing transcription key, which is expected on a
+      # runner with no secrets — the selftest below uses a cached transcript fixture
+      # and never calls an API. Run it for the diagnostics, not the exit code.
+      - name: Doctor (Unix)
+        if: runner.os != 'Windows'
+        run: bash plugins/video-studio/skills/video-studio/scripts/doctor.sh || true
+
+      - name: Doctor (Windows)
+        if: runner.os == 'Windows'
+        run: pwsh -File plugins\video-studio\skills\video-studio\scripts\doctor.ps1; exit 0
+        shell: pwsh
+
+      - name: Selftest (Unix)
+        if: runner.os != 'Windows'
+        run: bash plugins/video-studio/skills/video-studio/scripts/vs.sh selftest.py
+
+      - name: Selftest (Windows)
+        if: runner.os == 'Windows'
+        run: pwsh -File plugins\video-studio\skills\video-studio\scripts\vs.ps1 selftest.py
+        shell: pwsh
